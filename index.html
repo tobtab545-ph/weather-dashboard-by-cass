@@ -81,10 +81,10 @@
 
 	</div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+		 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
 
 			<!-- 🌡️ Temperature -->
-			<div onclick="setMetric('temp')" class="card-dark p-6 rounded-3xl relative overflow-hidden group cursor-pointer">
+			<div onclick="setMetric('temp', this)" class="card-dark p-6 rounded-3xl cursor-pointer">
 				<div class="flex justify-between items-start mb-4">
 					<div class="p-3 bg-orange-500/10 rounded-2xl text-orange-500">
 						<i data-lucide="thermometer"></i>
@@ -101,7 +101,7 @@
 			</div>
 
 			<!-- 💧 Humidity -->
-			<div onclick="setMetric('humid')" class="card-dark p-6 rounded-3xl relative overflow-hidden cursor-pointer">
+			<div onclick="setMetric('humid', this)" class="card-dark p-6 rounded-3xl cursor-pointer">
 				<div class="flex justify-between items-start mb-4">
 					<div class="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
 						<i data-lucide="droplets"></i>
@@ -118,16 +118,16 @@
 			</div>
 
 			<!-- 🌬️ Wind -->
-			<div onclick="setMetric('wind')" class="card-dark p-6 rounded-3xl relative overflow-hidden cursor-pointer">
+			<div onclick="setMetric('wind', this)" class="card-dark p-6 rounded-3xl cursor-pointer">
 				<div class="flex justify-between items-start mb-4">
 					<div class="p-3 bg-indigo-500/10 rounded-2xl text-indigo-500">
 						<i data-lucide="wind"></i>
 					</div>
-					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Wind Speed</span>
+					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Wind</span>
 				</div>
 				<div class="flex items-baseline gap-1">
 					<span id="windVal" class="text-4xl font-bold text-white">12</span>
-					<span class="text-slate-400 text-lg">km/h</span>
+					<span class="text-slate-400 text-lg">m/s</span>
 				</div>
 				<div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
 					<div id="windBar" class="h-full bg-indigo-500" style="width: 30%"></div>
@@ -135,12 +135,12 @@
 			</div>
 
 			<!-- 🌧️ Rain -->
-			<div onclick="setMetric('rain')" class="card-dark p-6 rounded-3xl relative overflow-hidden border-b-4 border-blue-500 cursor-pointer">
+			<div onclick="setMetric('rain', this)" class="card-dark p-6 rounded-3xl cursor-pointer">
 				<div class="flex justify-between items-start mb-4">
 					<div class="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500">
 						<i data-lucide="cloud-rain"></i>
 					</div>
-					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Rainfall</span>
+					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Rain</span>
 				</div>
 				<div class="flex items-baseline gap-1">
 					<span id="rainVal" class="text-4xl font-bold text-white">4.5</span>
@@ -150,6 +150,41 @@
 					<div id="rainBar" class="h-full bg-emerald-500" style="width: 20%"></div>
 				</div>
 			</div>
+
+			<!-- ☁️ Cloud -->
+			<div onclick="setMetric('cloud', this)" class="card-dark p-6 rounded-3xl cursor-pointer">
+				<div class="flex justify-between items-start mb-4">
+					<div class="p-3 bg-gray-500/10 rounded-2xl text-gray-400">
+						<i data-lucide="cloud"></i>
+					</div>
+					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Cloud</span>
+				</div>
+				<div class="flex items-baseline gap-1">
+					<span id="cloudVal" class="text-4xl font-bold text-white">60</span>
+					<span class="text-slate-400 text-lg">%</span>
+				</div>
+				<div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+					<div class="h-full bg-gray-400" style="width: 60%"></div>
+				</div>
+			</div>
+
+			<!-- ☀️ Solar -->
+			<div onclick="setMetric('solar', this)" class="card-dark p-6 rounded-3xl cursor-pointer">
+				<div class="flex justify-between items-start mb-4">
+					<div class="p-3 bg-yellow-500/10 rounded-2xl text-yellow-400">
+						<i data-lucide="sun"></i>
+					</div>
+					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Solar</span>
+				</div>
+				<div class="flex items-baseline gap-1">
+					<span id="solarVal" class="text-4xl font-bold text-white">800</span>
+					<span class="text-slate-400 text-lg">W/m²</span>
+				</div>
+				<div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+					<div class="h-full bg-yellow-400" style="width: 70%"></div>
+				</div>
+			</div>
+
 		</div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -161,40 +196,28 @@
 					</h3>
                 </div>
                 <div class="flex gap-2 mb-4">
-				  <button onclick="setRange('hourly')" class="px-3 py-1 bg-blue-600 rounded">
+				  <button id="btn-hourly" onclick="setRange('hourly')" class="px-3 py-1 rounded">
 					รายชั่วโมง
-				  </button>
-				  <button onclick="setRange('daily')" class="px-3 py-1 bg-slate-700 rounded">
+				</button>
+
+				<button id="btn-daily" onclick="setRange('daily')" class="px-3 py-1 rounded">
 					7 วัน
-				  </button>
+				</button>
 				</div>
 				
-                <div class="w-full">
+                <div class="w-full h-[300px]">
                     <canvas id="weatherChart"></canvas>
                 </div>
             </div>
 
             <div class="space-y-6">
-                <div class="card-dark rounded-3xl overflow-hidden bg-black relative shadow-2xl">
-                    <video id="loopVideo" autoplay muted loop playsinline class="w-full h-64 object-cover opacity-50">
-                        <source src="http://202.29.24.235/web_weather/windspeed%20in%20d1_SELECTED_20260114_168.mp4" type="video/mp4">
-                        เบราว์เซอร์ไม่รองรับการแสดงผลวิดีโอ
-                    </video>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-                        <i data-lucide="play" class="text-white/20 w-12 h-12 mb-2"></i>
-                        <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase italic">Live Visual Feedback</p>
-                    </div>
-                    <div class="absolute top-2 right-2 bg-red-600 px-2 py-0.5 rounded text-[10px] font-bold animate-pulse">LIVE</div>
-                </div>
-
                 <div class="card-dark p-6 rounded-3xl">
-                    <h3 class="font-bold text-xs mb-4 text-slate-400 uppercase tracking-widest">Media Control</h3>
-                    <label class="block w-full text-center bg-blue-600 hover:bg-blue-500 py-3 rounded-2xl cursor-pointer transition-all shadow-lg shadow-blue-600/20">
-                        <span class="text-sm font-bold text-white">อัปโหลดวิดีโอใหม่ (.mp4)</span>
-                        <input type="file" id="videoInput" accept="video/mp4" class="hidden">
-                    </label>
-                </div>
-            </div>
+			<h3 class="font-bold text-xs mb-4 text-slate-400 uppercase tracking-widest">
+				รายละเอียดตามช่วงเวลา
+			</h3>
+			<div id="timeBlocks" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+			</div>
+          </div>
         </div>
     </main>
 
@@ -212,7 +235,9 @@
 			temp: "อุณหภูมิ",
 			humid: "ความชื้นสัมพัทธ์",
 			wind: "ความเร็วลม",
-			rain: "ปริมาณน้ำฝน"
+			rain: "ปริมาณน้ำฝน",
+			cloud: "ปริมาณเมฆ",
+			solar: "รังสีดวงอาทิตย์"
 		};
 
 		const rangeLabel = {
@@ -223,8 +248,10 @@
 		const metricUnit = {
 			temp: "°C",
 			humid: "%",
-			wind: "km/h",
-			rain: "มม."
+			wind: "m/s",
+			rain: "มม.",
+			cloud: " ",
+			solar: "W/m²"
 		};
 
 		let villageData = [];
@@ -270,49 +297,24 @@
 			  });
 			}
 		
-		fetch("village_data.json")
-		  .then(res => res.json())
-		  .then(data => {
-			villageData = data.districts;
+			fetch("village_data.json")
+			  .then(res => res.json())
+			  .then(data => {
+				villageData = data.districts;
 
-			renderVillages();   // โหลดหมู่บ้าน
-			updateChart();      // วาดกราฟ
-		  });
-		
-		// 🔥 สร้างปุ่มหมู่บ้าน
-		function renderVillages() {
-			const container = document.getElementById("subVillageButtons");
-			container.innerHTML = "";
+				currentDistrict = 0;
+				currentVillage = 0;
 
-			const villages = villageData[currentDistrict].villages;
+				// 🔥 เพิ่มตรงนี้
+				renderDropdownVillages(0);
+				renderDropdownVillages(1);
+				renderDropdownVillages(2);
 
-			villages.forEach((village, index) => {
-				const btn = document.createElement("button");
-
-				btn.innerText = village.name;
-
-				btn.className =
-					"px-3 py-1 rounded-full border border-slate-600 text-sm hover:border-blue-400";
-
-				btn.onclick = () => {
-					currentVillage = index;
-
-					// 🔥 highlight
-					document.querySelectorAll("#subVillageButtons button").forEach(b => {
-						b.classList.remove("active-village");
-					});
-					btn.classList.add("active-village");
-
-					updateChart();
-				};
-
-				// 🔥 default active ตัวแรก
-				if(index === 0) btn.classList.add("active-village");
-
-				container.appendChild(btn);
-			});
-		}
-
+				updateChart();
+			  })
+			  .catch(err => {
+				console.error("โหลด JSON ไม่ได้:", err);
+			  });
 
 		// 🔥 สร้างกราฟ
 		const ctx = document.getElementById('weatherChart').getContext('2d');
@@ -345,44 +347,305 @@
 
 
 		// 🔥 update chart
-		function updateChart() {
-			const data = villageData[currentDistrict].villages[currentVillage];
+			function updateChart() {
+				if (!villageData.length) return;
+
+				const data = villageData[currentDistrict].villages[currentVillage];
+				if (!data) return;
+
+				// 🔹 update card (ทำทุกครั้ง ไม่ขึ้นกับกราฟ)
+				const safe = (val) => (val !== undefined && val !== null) ? val : "--";
+
+				document.getElementById('tempVal').innerText = safe(data.temp_hourly?.[0]);
+				document.getElementById('humidVal').innerText = safe(data.humid_hourly?.[0]);
+				document.getElementById('windVal').innerText = safe(data.wind_hourly?.[0]);
+				document.getElementById('rainVal').innerText = safe(data.rain_hourly?.[0]);
+				document.getElementById('cloudVal').innerText = safe(data.cloud_hourly?.[0]);
+				document.getElementById('solarVal').innerText = safe(data.solar_hourly?.[0]);
+
+				// 🔹 ชื่อ + location
+				document.getElementById('currentVillageName').innerText = data.name;
+
+				document.getElementById('locationText').innerText =
+					`ตำบล${data.subdistrict} · อำเภอ${data.district} · จังหวัด${data.province}`;
+
+				document.getElementById('coordText').innerText =
+					`Lat: ${data.lat}°N | Lon: ${data.lon}°E`;
+
+				// 🔹 เตรียม key
+				const key = currentMetric + "_" + currentRange;
+				let chartData = data[key];
+
+				// 🔥 NO DATA (กระทบเฉพาะกราฟ)
+				if (!chartData || chartData.length === 0) {
+
+					weatherChart.data.labels = [];
+					weatherChart.data.datasets[0].data = [];
+					weatherChart.update();
+
+					document.getElementById('chartTitle').innerText =
+						"ไม่มีข้อมูล (No Data)";
+
+					document.getElementById('chartTitle').classList.add("text-red-400");
+
+					document.getElementById("timeBlocks").innerHTML =
+						"<div class='col-span-full text-center text-slate-500'>No Data</div>";
+
+					return;
+				}
+
+				// 🔹 มีข้อมูล → reset สี title
+				document.getElementById('chartTitle').classList.remove("text-red-400");
+
+				// 🔹 labels
+				const labels = currentRange === "hourly"
+				? getThaiTimeLabels()
+				: getChartDateLabels();
+
+				// 🔹 update chart
+				weatherChart.data.labels = labels;
+				weatherChart.data.datasets[0].data = chartData;
+				weatherChart.data.datasets[0].label =
+					metricLabel[currentMetric] + " (" + metricUnit[currentMetric] + ")";
+
+				weatherChart.update();
+
+				// 🔹 title
+				document.getElementById('chartTitle').innerText =
+					"แนวโน้ม" + metricLabel[currentMetric] +
+					" " + rangeLabel[currentRange] +
+					" (" + metricUnit[currentMetric] + ")";
+
+				// 🔹 time blocks
+				renderTimeBlocks(data);
+			}
+		
+		function getThaiTimeLabels() {
+				const now = new Date();
+
+				const labels = [];
+
+				for (let i = 0; i < 6; i++) {
+					let d = new Date(now);
+					d.setHours(6 + i * 3, 0, 0, 0);
+
+					labels.push(
+					d.toLocaleTimeString('th-TH', {
+						hour: '2-digit',
+						minute: '2-digit',
+						timeZone: 'Asia/Bangkok'
+					}) + " น."
+				);
+				}
+
+				return labels;
+			}
+		
+		function getChartDateLabels() {
+			const now = new Date();
+
+			let labels = [];
+
+			for (let i = 0; i < 7; i++) {
+				let d = new Date(now);
+				d.setDate(now.getDate() + i);
+
+				const date = d.toLocaleDateString('th-TH', {
+					day: 'numeric',
+					month: 'short',
+					year: 'numeric'
+				});
+
+				labels.push(date);
+			}
+
+			return labels;
+		}
+		
+		function getFullThaiDayLabels() {
+			const daysFull = [
+				'วันอาทิตย์',
+				'วันจันทร์',
+				'วันอังคาร',
+				'วันพุธ',
+				'วันพฤหัสบดี',
+				'วันศุกร์',
+				'วันเสาร์'
+			];
+
+			const now = new Date();
+
+			let labels = [];
+
+			for (let i = 0; i < 7; i++) {
+				let d = new Date(now);
+				d.setDate(now.getDate() + i);
+
+				const day = daysFull[d.getDay()];
+
+				const date = d.toLocaleDateString('th-TH', {
+					day: 'numeric',
+					month: 'short',
+					year: 'numeric'
+				});
+
+				labels.push(`${day} ${date}`);
+			}
+
+			return labels;
+		}
+		
+		function getCurrentHourIndex() {
+			const now = new Date();
+			const hour = now.getHours();
+
+			const slots = [6, 9, 12, 15, 18, 21];
+
+			let closestIndex = 0;
+			let minDiff = 999;
+
+			slots.forEach((h, i) => {
+				const diff = Math.abs(hour - h);
+				if (diff < minDiff) {
+					minDiff = diff;
+					closestIndex = i;
+				}
+			});
+
+			return closestIndex;
+		}
+		
+		function lerp(a, b, t) {
+			return a + (b - a) * t;
+		}
+
+		function interpolateColor(c1, c2, t) {
+			const r = Math.round(lerp(c1[0], c2[0], t));
+			const g = Math.round(lerp(c1[1], c2[1], t));
+			const b = Math.round(lerp(c1[2], c2[2], t));
+			return `rgb(${r},${g},${b})`;
+		}
+		
+		function getTempGradient(val, min, max) {
+				if (val === undefined || val === null) return "rgb(30,41,59)";
+	
+				const t = Math.max(0, Math.min(1, (val - min) / (max - min || 1)));
+
+				const stops = [
+					{ t: 0.0, color: [0, 0, 130] },     // น้ำเงิน
+					{ t: 0.25, color: [0, 180, 255] },  // ฟ้า
+					{ t: 0.5, color: [0, 220, 100] },   // เขียว
+					{ t: 0.7, color: [255, 220, 0] },   // เหลือง
+					{ t: 0.85, color: [255, 120, 0] },  // ส้ม
+					{ t: 1.0, color: [180, 0, 0] }      // แดง
+				];
+
+				for (let i = 0; i < stops.length - 1; i++) {
+					const s1 = stops[i];
+					const s2 = stops[i + 1];
+
+					if (t >= s1.t && t <= s2.t) {
+						const localT = (t - s1.t) / (s2.t - s1.t);
+						const color = interpolateColor(s1.color, s2.color, localT);
+						return color.replace("rgb", "rgba").replace(")", ", 0.65)");
+					}
+				}
+
+				return "rgb(30,41,59)";
+			}
+
+		function renderTimeBlocks(data) {
+			const container = document.getElementById("timeBlocks");
+			container.innerHTML = "";
 
 			const key = currentMetric + "_" + currentRange;
 			const chartData = data[key];
 
+			if (!chartData || chartData.length === 0) {
+				container.innerHTML =
+					"<div class='col-span-full text-center text-slate-500'>No Data</div>";
+				return;
+			}
+			
+			const dayColorMap = [
+				"bg-yellow-400/20 border-yellow-400/40",  // จันทร์
+				"bg-pink-400/20 border-pink-400/40",      // อังคาร
+				"bg-green-400/20 border-green-400/40",    // พุธ
+				"bg-orange-400/20 border-orange-400/40",  // พฤหัส
+				"bg-sky-400/20 border-sky-400/40",        // ศุกร์
+				"bg-purple-400/20 border-purple-400/40",  // เสาร์
+				"bg-slate-400/20 border-slate-400/40"     // อาทิตย์ (เผื่อไว้)
+			];
+			
 			const labels = currentRange === "hourly"
-				? ['06:00','09:00','12:00','15:00','18:00','21:00']
-				: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+			? getThaiTimeLabels()
+			: getFullThaiDayLabels();
 
-			weatherChart.data.labels = labels;
-			weatherChart.data.datasets[0].data = chartData;
-			weatherChart.data.datasets[0].label =
-				metricLabel[currentMetric] + " (" + metricUnit[currentMetric] + ")";
+			const minVal = Math.min(...chartData);
+			const maxVal = Math.max(...chartData);
 
-			weatherChart.update();
+			chartData.forEach((val, i) => {
 
-			// 🔥 title
-			document.getElementById('chartTitle').innerText =
-				"แนวโน้ม" + metricLabel[currentMetric] +
-				" " + rangeLabel[currentRange] +
-				" (" + metricUnit[currentMetric] + ")";
+			const block = document.createElement("div");
 
-			// 🔥 card
-			document.getElementById('tempVal').innerText = data.temp_hourly[0];
-			document.getElementById('humidVal').innerText = data.humid_hourly[0];
-			document.getElementById('windVal').innerText = data.wind_hourly[0];
-			document.getElementById('rainVal').innerText = data.rain_hourly[0];
+			const isHourly = currentRange === "hourly";
+			const isToday = i === 0;
+			const currentHourIndex = getCurrentHourIndex();
+			const isNow = isHourly && i === currentHourIndex;
 
-			// 🔥 ชื่อหมู่บ้าน
-			document.getElementById('currentVillageName').innerText = data.name;
-			// 🔥 location
-			document.getElementById('locationText').innerText =
-				`ตำบล${data.subdistrict} · อำเภอ${data.district} · จังหวัด${data.province}`;
+			// 🎨 เลือกสี
+			let baseColor;
 
-			// 🔥 lat lon
-			document.getElementById('coordText').innerText =
-				`Lat: ${data.lat}°N | Lon: ${data.lon}°E`;
+			let bgColor = null;
+
+			if (isHourly && currentMetric === "temp") {
+				bgColor = getTempGradient(val, minVal, maxVal);
+			} else if (currentRange === "daily") {
+				baseColor = dayColorMap[i] || "bg-slate-800 border-slate-700";
+			} else {
+				baseColor = "bg-slate-800 border-slate-700";
+			}
+
+			// 🏷 label
+			let labelText = labels[i];
+
+			if (isNow) labelText = "ตอนนี้";
+			else if (isToday && currentRange === "daily") labelText = "วันนี้";
+
+			// 🎯 class
+			block.className = `
+				p-4 rounded-2xl border
+				flex flex-col items-center justify-center text-center
+				transition duration-300
+				hover:scale-105
+				${isNow ? "ring-2 ring-yellow-400 scale-110 shadow-lg shadow-yellow-500/30" : ""}
+			`;
+			if (bgColor) {
+				block.style.background = bgColor;
+				block.style.borderColor = bgColor;
+				block.style.boxShadow = `0 0 10px ${bgColor}55`;
+			} else if (currentRange === "daily") {
+				block.classList.add(...(dayColorMap[i] || "").split(" "));
+			} else {
+				block.classList.add("bg-slate-800", "border-slate-700");
+			}
+
+			block.innerHTML = `
+			<div class="text-xs text-slate-300 mb-1">
+				${labelText}
+			</div>
+
+			<div class="text-2xl font-bold text-white">
+				${val ?? "--"}
+			</div>
+
+			<div class="text-xs text-slate-400 mt-1">
+				${metricUnit[currentMetric]}
+			</div>
+		`;
+
+			container.appendChild(block);
+		});
 		}
 
 
@@ -390,8 +653,6 @@
 		function updateDistrict(index) {
 			currentDistrict = index;
 			currentVillage = 0;
-
-			renderVillages();   // 🔥 สำคัญ
 			updateChart();
 
 			// highlight อำเภอ
@@ -408,29 +669,37 @@
 			updateDistrict(index);
 		}
 
-
 		// 🔥 controls
-		function setMetric(metric) {
-			currentMetric = metric;
-			updateChart();
-		}
+	function setMetric(metric, el) {
+		currentMetric = metric;
+
+		document.querySelectorAll('.card-dark').forEach(c => {
+			c.classList.remove('ring-2','ring-blue-500');
+		});
+
+		el.classList.add('ring-2','ring-blue-500');
+
+		updateChart();
+	}
 
 		function setRange(range) {
 			currentRange = range;
+
+			// 🔥 reset ปุ่มทั้งหมด
+			document.getElementById("btn-hourly").className =
+				"px-3 py-1 bg-slate-700 rounded text-slate-300";
+
+			document.getElementById("btn-daily").className =
+				"px-3 py-1 bg-slate-700 rounded text-slate-300";
+
+			// 🔥 active ปุ่มที่เลือก
+			const activeBtn = document.getElementById(`btn-${range}`);
+
+			activeBtn.className =
+				"px-3 py-1 bg-blue-600 text-white rounded shadow-lg shadow-blue-500/30";
+
 			updateChart();
 		}
-
-
-		// 🔥 video
-		document.getElementById('videoInput').addEventListener('change', function(e) {
-			const file = e.target.files[0];
-			if (file) {
-				const url = URL.createObjectURL(file);
-				const video = document.getElementById('loopVideo');
-				video.src = url;
-				video.play();
-			}
-		});
 
 	</script>
 </body>
