@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASS | Village Weather Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .active-village { background-color: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3); }
+        .bg-dark { background-color: #0f172a; }
+        .card-dark { background-color: #1e293b; border: 1px solid #334155; }
+        .tab-btn { transition: all 0.3s ease; }
+        canvas { max-height: 350px; }
+    </style>
+</head>
+<body class="bg-dark text-slate-200 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="p-2 bg-blue-600 rounded-lg"><i data-lucide="user" class="text-white"></i></div>
+                <h1 class="text-xl font-bold tracking-tight">CASS <span class="text-blue-400">DASHBOARD</span></h1>
+            </div>
+            
+		<div class="flex flex-wrap justify-center gap-2" id="villageButtons">
+			<!-- อำเภอ 0 -->
+			<div class="relative">
+				<button onclick="toggleDropdown(0)" 
+					class="tab-btn active-village px-4 py-2 rounded-full border border-slate-700 text-sm font-medium">
+					อำเภอเมืองสกลนคร ▼
+				</button>
+				<div id="dropdown-0" class="hidden absolute mt-2 bg-slate-800 rounded-xl shadow-lg p-2 space-y-1 z-50 min-w-[180px]"></div>
+			</div>
+			<!-- อำเภอ 1 -->
+			<div class="relative">
+				<button onclick="toggleDropdown(1)" 
+					class="tab-btn px-4 py-2 rounded-full border border-slate-700 text-sm font-medium hover:border-slate-500">
+					อำเภอโคกศรีสุพรรณ ▼
+				</button>
+				<div id="dropdown-1" class="hidden absolute mt-2 bg-slate-800 rounded-xl shadow-lg p-2 space-y-1 z-50 min-w-[180px]"></div>
+			</div>
+			<!-- อำเภอ 2 -->
+			<div class="relative">
+				<button onclick="toggleDropdown(2)" 
+					class="tab-btn px-4 py-2 rounded-full border border-slate-700 text-sm font-medium hover:border-slate-500">
+					อำเภอโพนนาแก้ว ▼
+				</button>
+				<div id="dropdown-2" class="hidden absolute mt-2 bg-slate-800 rounded-xl shadow-lg p-2 space-y-1 z-50 min-w-[180px]"></div>
+			</div>
+		</div>
+        </div>
+    </nav>
+
+    <main class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full">
+        
+	<div class="mb-8 border-l-4 border-blue-500 pl-6">
+		
+		<!-- 🏷️ ชื่อหมู่บ้าน -->
+		<h2 id="currentVillageName"
+			class="text-4xl font-black text-white italic tracking-tighter uppercase">
+			บ้านโนนประดู่
+		</h2>
+
+		<!-- 📍 ที่ตั้ง -->
+		<p id="locationText"
+			class="text-slate-400 text-sm mt-2">
+		</p>
+
+		<!-- 🌍 พิกัด -->
+		<p id="coordText"
+		   class="text-slate-500 text-xs font-mono">
+		</p>
+
+		<!-- ⚙️ system -->
+		<p class="text-slate-600 text-[10px] uppercase tracking-[0.2em] mt-2">
+			Administered by:
+			<span class="text-blue-400 font-bold">CASS</span>
+		</p>
+
+	</div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+			<!-- 🌡️ Temperature -->
+			<div onclick="setMetric('temp')" class="card-dark p-6 rounded-3xl relative overflow-hidden group cursor-pointer">
+				<div class="flex justify-between items-start mb-4">
+					<div class="p-3 bg-orange-500/10 rounded-2xl text-orange-500">
+						<i data-lucide="thermometer"></i>
+					</div>
+					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Temperature</span>
+				</div>
+				<div class="flex items-baseline gap-1">
+					<span id="tempVal" class="text-4xl font-bold text-white">32</span>
+					<span class="text-slate-400 text-lg">°C</span>
+				</div>
+				<div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+					<div id="tempBar" class="h-full bg-orange-500" style="width: 70%"></div>
+				</div>
+			</div>
+
+			<!-- 💧 Humidity -->
+			<div onclick="setMetric('humid')" class="card-dark p-6 rounded-3xl relative overflow-hidden cursor-pointer">
+				<div class="flex justify-between items-start mb-4">
+					<div class="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
+						<i data-lucide="droplets"></i>
+					</div>
+					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Humidity</span>
+				</div>
+				<div class="flex items-baseline gap-1">
+					<span id="humidVal" class="text-4xl font-bold text-white">65</span>
+					<span class="text-slate-400 text-lg">%</span>
+				</div>
+				<div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+					<div id="humidBar" class="h-full bg-blue-500" style="width: 65%"></div>
+				</div>
+			</div>
+
+			<!-- 🌬️ Wind -->
+			<div onclick="setMetric('wind')" class="card-dark p-6 rounded-3xl relative overflow-hidden cursor-pointer">
+				<div class="flex justify-between items-start mb-4">
+					<div class="p-3 bg-indigo-500/10 rounded-2xl text-indigo-500">
+						<i data-lucide="wind"></i>
+					</div>
+					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Wind Speed</span>
+				</div>
+				<div class="flex items-baseline gap-1">
+					<span id="windVal" class="text-4xl font-bold text-white">12</span>
+					<span class="text-slate-400 text-lg">km/h</span>
+				</div>
+				<div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+					<div id="windBar" class="h-full bg-indigo-500" style="width: 30%"></div>
+				</div>
+			</div>
+
+			<!-- 🌧️ Rain -->
+			<div onclick="setMetric('rain')" class="card-dark p-6 rounded-3xl relative overflow-hidden border-b-4 border-blue-500 cursor-pointer">
+				<div class="flex justify-between items-start mb-4">
+					<div class="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500">
+						<i data-lucide="cloud-rain"></i>
+					</div>
+					<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Rainfall</span>
+				</div>
+				<div class="flex items-baseline gap-1">
+					<span id="rainVal" class="text-4xl font-bold text-white">4.5</span>
+					<span class="text-slate-400 text-lg">mm</span>
+				</div>
+				<div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+					<div id="rainBar" class="h-full bg-emerald-500" style="width: 20%"></div>
+				</div>
+			</div>
+		</div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 card-dark p-6 rounded-3xl shadow-2xl">
+                <div class="flex items-center justify-between mb-6">
+					<h3 id="chartTitle" class="font-bold text-lg flex items-center gap-2 text-white">
+						<i data-lucide="line-chart" class="text-blue-400 w-5 h-5"></i>
+						แนวโน้มสภาพอากาศ
+					</h3>
+                </div>
+                <div class="flex gap-2 mb-4">
+				  <button onclick="setRange('hourly')" class="px-3 py-1 bg-blue-600 rounded">
+					รายชั่วโมง
+				  </button>
+				  <button onclick="setRange('daily')" class="px-3 py-1 bg-slate-700 rounded">
+					7 วัน
+				  </button>
+				</div>
+				
+                <div class="w-full">
+                    <canvas id="weatherChart"></canvas>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="card-dark rounded-3xl overflow-hidden bg-black relative shadow-2xl">
+                    <video id="loopVideo" autoplay muted loop playsinline class="w-full h-64 object-cover opacity-50">
+                        <source src="http://202.29.24.235/web_weather/windspeed%20in%20d1_SELECTED_20260114_168.mp4" type="video/mp4">
+                        เบราว์เซอร์ไม่รองรับการแสดงผลวิดีโอ
+                    </video>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                        <i data-lucide="play" class="text-white/20 w-12 h-12 mb-2"></i>
+                        <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase italic">Live Visual Feedback</p>
+                    </div>
+                    <div class="absolute top-2 right-2 bg-red-600 px-2 py-0.5 rounded text-[10px] font-bold animate-pulse">LIVE</div>
+                </div>
+
+                <div class="card-dark p-6 rounded-3xl">
+                    <h3 class="font-bold text-xs mb-4 text-slate-400 uppercase tracking-widest">Media Control</h3>
+                    <label class="block w-full text-center bg-blue-600 hover:bg-blue-500 py-3 rounded-2xl cursor-pointer transition-all shadow-lg shadow-blue-600/20">
+                        <span class="text-sm font-bold text-white">อัปโหลดวิดีโอใหม่ (.mp4)</span>
+                        <input type="file" id="videoInput" accept="video/mp4" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-8 text-center text-slate-600 text-[10px] uppercase tracking-[0.3em]">
+        Designed and Developed by CASS &copy; 2026
+    </footer>
+
+	<script>
+		let currentDistrict = 0;
+		let currentVillage = 0;
+		let currentMetric = "temp";
+		let currentRange = "hourly";
+
+		const metricLabel = {
+			temp: "อุณหภูมิ",
+			humid: "ความชื้นสัมพัทธ์",
+			wind: "ความเร็วลม",
+			rain: "ปริมาณน้ำฝน"
+		};
+
+		const rangeLabel = {
+			hourly: "รายชั่วโมง",
+			daily: "7 วัน"
+		};
+
+		const metricUnit = {
+			temp: "°C",
+			humid: "%",
+			wind: "km/h",
+			rain: "มม."
+		};
+
+		let villageData = [];
+
+		lucide.createIcons();
+
+		function toggleDropdown(index) {
+			  const dropdown = document.getElementById(`dropdown-${index}`);
+
+			  // ปิดตัวอื่นก่อน
+			  document.querySelectorAll("[id^='dropdown-']").forEach(el => {
+				if (el !== dropdown) el.classList.add("hidden");
+			  });
+
+			  // toggle ตัวที่กด
+			  dropdown.classList.toggle("hidden");
+
+			  // render หมู่บ้าน
+			  renderDropdownVillages(index);
+			}
+
+		function renderDropdownVillages(districtIndex) {
+			  const container = document.getElementById(`dropdown-${districtIndex}`);
+			  container.innerHTML = "";
+
+			  villageData[districtIndex].villages.forEach((village, i) => {
+				const btn = document.createElement("button");
+
+				btn.innerText = village.name;
+				btn.className = "block w-full text-left px-3 py-2 rounded hover:bg-blue-500/20";
+
+				btn.onclick = () => {
+				  currentDistrict = districtIndex;
+				  currentVillage = i;
+
+				  updateChart();
+
+				  // ปิด dropdown
+				  container.classList.add("hidden");
+				};
+
+				container.appendChild(btn);
+			  });
+			}
+		
+		fetch("village_data.json")
+		  .then(res => res.json())
+		  .then(data => {
+			villageData = data.districts;
+
+			renderVillages();   // โหลดหมู่บ้าน
+			updateChart();      // วาดกราฟ
+		  });
+		
+		// 🔥 สร้างปุ่มหมู่บ้าน
+		function renderVillages() {
+			const container = document.getElementById("subVillageButtons");
+			container.innerHTML = "";
+
+			const villages = villageData[currentDistrict].villages;
+
+			villages.forEach((village, index) => {
+				const btn = document.createElement("button");
+
+				btn.innerText = village.name;
+
+				btn.className =
+					"px-3 py-1 rounded-full border border-slate-600 text-sm hover:border-blue-400";
+
+				btn.onclick = () => {
+					currentVillage = index;
+
+					// 🔥 highlight
+					document.querySelectorAll("#subVillageButtons button").forEach(b => {
+						b.classList.remove("active-village");
+					});
+					btn.classList.add("active-village");
+
+					updateChart();
+				};
+
+				// 🔥 default active ตัวแรก
+				if(index === 0) btn.classList.add("active-village");
+
+				container.appendChild(btn);
+			});
+		}
+
+
+		// 🔥 สร้างกราฟ
+		const ctx = document.getElementById('weatherChart').getContext('2d');
+		let weatherChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: [],
+				datasets: [{
+					label: '',
+					data: [],
+					borderColor: '#3b82f6',
+					backgroundColor: 'rgba(59, 130, 246, 0.1)',
+					fill: true,
+					tension: 0.4,
+					borderWidth: 4,
+					pointRadius: 6,
+					pointBackgroundColor: '#fff'
+				}]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: { legend: { display: false } },
+				scales: {
+					y: { grid: { color: '#334155' }, ticks: { color: '#64748b' } },
+					x: { grid: { display: false }, ticks: { color: '#64748b' } }
+				}
+			}
+		});
+
+
+		// 🔥 update chart
+		function updateChart() {
+			const data = villageData[currentDistrict].villages[currentVillage];
+
+			const key = currentMetric + "_" + currentRange;
+			const chartData = data[key];
+
+			const labels = currentRange === "hourly"
+				? ['06:00','09:00','12:00','15:00','18:00','21:00']
+				: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+			weatherChart.data.labels = labels;
+			weatherChart.data.datasets[0].data = chartData;
+			weatherChart.data.datasets[0].label =
+				metricLabel[currentMetric] + " (" + metricUnit[currentMetric] + ")";
+
+			weatherChart.update();
+
+			// 🔥 title
+			document.getElementById('chartTitle').innerText =
+				"แนวโน้ม" + metricLabel[currentMetric] +
+				" " + rangeLabel[currentRange] +
+				" (" + metricUnit[currentMetric] + ")";
+
+			// 🔥 card
+			document.getElementById('tempVal').innerText = data.temp_hourly[0];
+			document.getElementById('humidVal').innerText = data.humid_hourly[0];
+			document.getElementById('windVal').innerText = data.wind_hourly[0];
+			document.getElementById('rainVal').innerText = data.rain_hourly[0];
+
+			// 🔥 ชื่อหมู่บ้าน
+			document.getElementById('currentVillageName').innerText = data.name;
+			// 🔥 location
+			document.getElementById('locationText').innerText =
+				`ตำบล${data.subdistrict} · อำเภอ${data.district} · จังหวัด${data.province}`;
+
+			// 🔥 lat lon
+			document.getElementById('coordText').innerText =
+				`Lat: ${data.lat}°N | Lon: ${data.lon}°E`;
+		}
+
+
+		// 🔥 เปลี่ยนอำเภอ (สำคัญ)
+		function updateDistrict(index) {
+			currentDistrict = index;
+			currentVillage = 0;
+
+			renderVillages();   // 🔥 สำคัญ
+			updateChart();
+
+			// highlight อำเภอ
+			const buttons = document.querySelectorAll('#villageButtons button');
+			buttons.forEach((btn, i) => {
+				if(i === index) btn.classList.add('active-village');
+				else btn.classList.remove('active-village');
+			});
+		}
+
+
+		// ❌ ฟังก์ชันเดิมไม่ใช้แล้ว (แต่ไม่ลบก็ได้)
+		function updateVillageData(index) {
+			updateDistrict(index);
+		}
+
+
+		// 🔥 controls
+		function setMetric(metric) {
+			currentMetric = metric;
+			updateChart();
+		}
+
+		function setRange(range) {
+			currentRange = range;
+			updateChart();
+		}
+
+
+		// 🔥 video
+		document.getElementById('videoInput').addEventListener('change', function(e) {
+			const file = e.target.files[0];
+			if (file) {
+				const url = URL.createObjectURL(file);
+				const video = document.getElementById('loopVideo');
+				video.src = url;
+				video.play();
+			}
+		});
+
+	</script>
+</body>
+</html>
